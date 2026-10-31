@@ -1,12 +1,18 @@
 
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数字华容道 | Number Puzzle</title>
 
 <style>
+
+/* ================================
+   1. 页面基础样式
+================================ */
+
 * {
     box-sizing: border-box;
 }
@@ -15,10 +21,13 @@ body {
     margin: 0;
     min-height: 100vh;
     font-family: "Microsoft YaHei", sans-serif;
+
     background: linear-gradient(135deg, #e8efff, #f7edff);
+
     display: flex;
     justify-content: center;
     align-items: center;
+
     padding: 25px 15px;
     color: #293858;
 }
@@ -26,11 +35,18 @@ body {
 .game {
     width: 100%;
     max-width: 540px;
-    background: rgba(255,255,255,0.92);
+
+    background: rgba(255,255,255,0.95);
+
     padding: 30px;
     border-radius: 24px;
+
     box-shadow: 0 15px 50px rgba(76,85,130,0.13);
 }
+
+/* ================================
+   2. 标题
+================================ */
 
 header {
     text-align: center;
@@ -48,6 +64,10 @@ h1 {
     font-size: 14px;
 }
 
+/* ================================
+   3. 游戏设置
+================================ */
+
 .settings {
     display: flex;
     justify-content: space-between;
@@ -56,7 +76,8 @@ h1 {
     margin-bottom: 20px;
 }
 
-select, .restart {
+select,
+.restart {
     border: none;
     padding: 11px 15px;
     border-radius: 10px;
@@ -80,6 +101,10 @@ select {
     background: #536fc6;
     transform: translateY(-2px);
 }
+
+/* ================================
+   4. 数据统计
+================================ */
 
 .stats {
     display: grid;
@@ -107,31 +132,58 @@ select {
     color: #5069ae;
 }
 
+/* ================================
+   5. 棋盘
+================================ */
+
 .board {
     --size: 3;
+
     display: grid;
     grid-template-columns: repeat(var(--size), 1fr);
+
     gap: 7px;
+
     width: 100%;
     aspect-ratio: 1;
+
     background: #dce3f5;
     padding: 8px;
     border-radius: 15px;
+
     margin-bottom: 20px;
+
+    overflow: hidden;
 }
 
 .tile {
     border: none;
     border-radius: 9px;
+
     background: linear-gradient(145deg, #8fa7eb, #718bd7);
+
     color: white;
     font-size: clamp(12px, 5vw, 25px);
     font-weight: bold;
-    cursor: pointer;
+
+    cursor: grab;
+
     box-shadow: 0 3px 5px rgba(68,84,140,0.15);
-    transition: background 0.15s, transform 0.15s;
+
+    transition: transform 0.18s ease,
+                background 0.15s;
+
     min-width: 0;
+    min-height: 0;
     padding: 0;
+
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .tile:hover {
@@ -139,7 +191,7 @@ select {
 }
 
 .tile:active {
-    transform: scale(0.94);
+    cursor: grabbing;
 }
 
 .tile.empty {
@@ -148,12 +200,18 @@ select {
     cursor: default;
 }
 
+/* ================================
+   6. 提示文字
+================================ */
+
 .message {
     text-align: center;
     min-height: 25px;
+
     color: #7189d9;
     font-size: 14px;
     font-weight: bold;
+
     margin-bottom: 12px;
 }
 
@@ -164,7 +222,12 @@ select {
     line-height: 1.8;
 }
 
+/* ================================
+   7. 手机适配
+================================ */
+
 @media (max-width: 480px) {
+
     .game {
         padding: 20px;
     }
@@ -181,9 +244,12 @@ select {
     .tile {
         border-radius: 5px;
     }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
@@ -191,14 +257,19 @@ select {
 
     <header>
         <h1>NUMBER PUZZLE</h1>
+
         <div class="subtitle">
             数字华容道 · 挑战你的逻辑思维
         </div>
     </header>
 
+
+    <!-- 游戏设置 -->
+
     <div class="settings">
 
         <select id="sizeSelect">
+
             <option value="3">3 × 3 · 简单</option>
             <option value="4">4 × 4 · 入门</option>
             <option value="5">5 × 5 · 普通</option>
@@ -206,6 +277,7 @@ select {
             <option value="7">7 × 7 · 困难</option>
             <option value="8">8 × 8 · 挑战</option>
             <option value="9">9 × 9 · 大师</option>
+
         </select>
 
         <button class="restart" id="restart">
@@ -214,87 +286,132 @@ select {
 
     </div>
 
+
+    <!-- 游戏数据 -->
+
     <div class="stats">
 
         <div class="stat">
+
             <div class="stat-label">移动步数</div>
-            <div class="stat-value" id="moves">0</div>
+
+            <div class="stat-value" id="moves">
+                0
+            </div>
+
         </div>
 
         <div class="stat">
+
             <div class="stat-label">游戏时间</div>
-            <div class="stat-value" id="timer">00:00</div>
+
+            <div class="stat-value" id="timer">
+                00:00
+            </div>
+
         </div>
 
         <div class="stat">
+
             <div class="stat-label">棋盘规格</div>
-            <div class="stat-value" id="level">3×3</div>
+
+            <div class="stat-value" id="level">
+                3×3
+            </div>
+
         </div>
 
     </div>
 
+
+    <!-- 游戏棋盘 -->
+
     <div class="board" id="board"></div>
+
+
+    <!-- 游戏提示 -->
 
     <div class="message" id="message">
         将数字按顺序排列，开始挑战吧！
     </div>
 
     <div class="tips">
-        点击与空格相邻的数字即可移动<br>
-        也可以使用键盘方向键操作
+        电脑：按住方块拖动<br>
+        手机：手指滑动方块<br>
+        也可以点击相邻数字或使用方向键
     </div>
 
 </div>
 
+
 <script>
 
-// ================================
+// =====================================
 // 1. 获取页面元素
-// ================================
+// =====================================
 
 const boardElement = document.getElementById("board");
+
 const sizeSelect = document.getElementById("sizeSelect");
+
 const restartButton = document.getElementById("restart");
 
 const movesElement = document.getElementById("moves");
+
 const timerElement = document.getElementById("timer");
+
 const levelElement = document.getElementById("level");
+
 const messageElement = document.getElementById("message");
 
-// ================================
+
+// =====================================
 // 2. 游戏数据
-// ================================
+// =====================================
 
 let size = 3;
+
 let board = [];
 
 let moves = 0;
+
 let seconds = 0;
 
 let timer = null;
+
+let animationTimeout = null;
+
 let started = false;
+
 let finished = false;
 
-// ================================
-// 3. 判断是否已经完成
-// ================================
+let isAnimating = false;
+
+
+// =====================================
+// 3. 判断游戏是否胜利
+// =====================================
 
 function checkWin() {
 
     for (let i = 0; i < board.length - 1; i++) {
 
         if (board[i] !== i + 1) {
+
             return false;
+
         }
 
     }
 
     return board[board.length - 1] === 0;
+
 }
 
-// ================================
-// 4. 生成一个有解的随机棋盘
-// ================================
+
+// =====================================
+// 4. 随机生成有解棋盘
+// =====================================
 
 function shuffleBoard() {
 
@@ -302,25 +419,28 @@ function shuffleBoard() {
 
     const total = size * size;
 
-    // 先生成正确顺序
+    // 生成正确顺序
 
     for (let i = 1; i < total; i++) {
+
         board.push(i);
+
     }
 
     board.push(0);
 
     let empty = total - 1;
+
     let previousEmpty = -1;
 
-    // 通过合法移动打乱棋盘
-    // 这样生成的棋盘一定有解
-
     const shuffleTimes = Math.max(150, total * 15);
+
+    // 通过合法移动打乱棋盘
 
     for (let i = 0; i < shuffleTimes; i++) {
 
         const row = Math.floor(empty / size);
+
         const col = empty % size;
 
         let candidates = [];
@@ -348,32 +468,41 @@ function shuffleBoard() {
         );
 
         if (available.length === 0) {
+
             available = candidates;
+
         }
 
         const target = available[
             Math.floor(Math.random() * available.length)
         ];
 
+        // 交换空格和目标数字
+
         [board[empty], board[target]] =
         [board[target], board[empty]];
 
         previousEmpty = empty;
+
         empty = target;
 
     }
 
-    // 避免出现刚好已经完成的情况
+    // 避免随机结果恰好已经完成
 
     if (checkWin()) {
-        [board[0], board[1]] = [board[1], board[0]];
+
+        [board[0], board[1]] =
+        [board[1], board[0]];
+
     }
 
 }
 
-// ================================
+
+// =====================================
 // 5. 绘制棋盘
-// ================================
+// =====================================
 
 function renderBoard() {
 
@@ -388,18 +517,191 @@ function renderBoard() {
         if (number === 0) {
 
             tile.className = "tile empty";
+
             tile.disabled = true;
+
             tile.setAttribute("aria-label", "空格");
 
         } else {
 
             tile.className = "tile";
+
             tile.textContent = number;
 
             tile.setAttribute("aria-label", "数字 " + number);
 
-            tile.addEventListener("click", function() {
-                moveTile(index);
+            let startX = 0;
+
+            let startY = 0;
+
+            let isDragging = false;
+
+
+            // 鼠标或手指按下
+
+            tile.addEventListener("pointerdown", function(event) {
+
+                if (event.pointerType === "mouse" && event.button !== 0) {
+                    return;
+                }
+
+                if (isAnimating || finished) return;
+
+                startX = event.clientX;
+
+                startY = event.clientY;
+
+                isDragging = true;
+
+                tile.style.transition = "none";
+
+                tile.setPointerCapture(event.pointerId);
+
+            });
+
+
+            // 拖动过程中，让方块跟随鼠标或手指
+
+            tile.addEventListener("pointermove", function(event) {
+
+                if (!isDragging || isAnimating || finished) return;
+
+                const dx = event.clientX - startX;
+
+                const dy = event.clientY - startY;
+
+                tile.style.transform =
+                    `translate(${dx}px, ${dy}px)`;
+
+            });
+
+
+            // 松开鼠标或手指
+
+            tile.addEventListener("pointerup", function(event) {
+
+                if (!isDragging) return;
+
+                isDragging = false;
+
+                if (isAnimating || finished) return;
+
+                const dx = event.clientX - startX;
+
+                const dy = event.clientY - startY;
+
+                // 判断是否只是点击
+
+                if (Math.max(Math.abs(dx), Math.abs(dy)) < 12) {
+
+                    tile.style.transition = "";
+
+                    tile.style.transform = "";
+
+                    slideTile(index);
+
+                    return;
+
+                }
+
+                let target = index;
+
+                // 判断主要滑动方向
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+
+                    if (dx > 0) {
+
+                        target = index + 1;
+
+                    } else {
+
+                        target = index - 1;
+
+                    }
+
+                } else {
+
+                    if (dy > 0) {
+
+                        target = index + size;
+
+                    } else {
+
+                        target = index - size;
+
+                    }
+
+                }
+
+                // 判断目标是否在棋盘范围内
+
+                if (target < 0 || target >= board.length) {
+
+                    tile.style.transition = "";
+
+                    tile.style.transform = "";
+
+                    return;
+
+                }
+
+                // 防止左右跨行
+
+                if (
+                    Math.abs(dx) > Math.abs(dy) &&
+                    Math.floor(target / size) !== Math.floor(index / size)
+                ) {
+
+                    tile.style.transition = "";
+
+                    tile.style.transform = "";
+
+                    return;
+
+                }
+
+                // 只有空格在滑动方向上才允许移动
+
+                if (target === board.indexOf(0)) {
+
+                    slideTile(index, dx, dy);
+
+                } else {
+
+                    // 不合法时，方块回到原位
+
+                    tile.style.transition = "transform 0.18s ease";
+
+                    tile.style.transform = "";
+
+                    setTimeout(() => {
+
+                        tile.style.transition = "";
+
+                    }, 180);
+
+                }
+
+            });
+
+
+            // 手指意外取消操作
+
+            tile.addEventListener("pointercancel", function() {
+
+                isDragging = false;
+
+                tile.style.transition = "transform 0.18s ease";
+
+                tile.style.transform = "";
+
+                setTimeout(() => {
+
+                    tile.style.transition = "";
+
+                }, 180);
+
             });
 
         }
@@ -410,18 +712,21 @@ function renderBoard() {
 
 }
 
-// ================================
+
+// =====================================
 // 6. 判断数字能否移动
-// ================================
+// =====================================
 
 function canMove(index) {
 
     const empty = board.indexOf(0);
 
     const row1 = Math.floor(index / size);
+
     const col1 = index % size;
 
     const row2 = Math.floor(empty / size);
+
     const col2 = empty % size;
 
     const distance =
@@ -429,58 +734,99 @@ function canMove(index) {
         Math.abs(col1 - col2);
 
     return distance === 1;
+
 }
 
-// ================================
-// 7. 移动数字
-// ================================
 
-function moveTile(index) {
+// =====================================
+// 7. 滑动动画
+// =====================================
 
-    if (finished) return;
+function slideTile(index, dragX = 0, dragY = 0) {
+
+    if (finished || isAnimating) return;
 
     if (!canMove(index)) return;
 
-    // 第一次移动时启动计时器
-
-    if (!started) {
-        started = true;
-        startTimer();
-    }
-
     const empty = board.indexOf(0);
 
-    // 交换数字和空格
+    const tiles = boardElement.children;
 
-    [board[index], board[empty]] =
-    [board[empty], board[index]];
+    const currentTile = tiles[index];
 
-    moves++;
+    const emptyTile = tiles[empty];
 
-    updateStats();
+    // 获取空格位置
 
-    renderBoard();
+    const currentRect = currentTile.getBoundingClientRect();
 
-    // 检查是否胜利
+    const emptyRect = emptyTile.getBoundingClientRect();
 
-    if (checkWin()) {
+    const dx = emptyRect.left - currentRect.left;
 
-        finished = true;
+    const dy = emptyRect.top - currentRect.top;
 
-        clearInterval(timer);
+    isAnimating = true;
 
-        messageElement.textContent =
-            "恭喜你！挑战成功！";
+    // 让方块从拖动位置平滑滑入空格
 
-    }
+    currentTile.style.transition = "transform 0.18s ease";
+
+    currentTile.style.transform =
+        `translate(${dx}px, ${dy}px)`;
+
+    // 等待动画结束
+
+    animationTimeout = setTimeout(function() {
+
+        // 交换数字和空格
+
+        [board[index], board[empty]] =
+        [board[empty], board[index]];
+
+        // 第一次移动时启动计时器
+
+        if (!started) {
+
+            started = true;
+
+            startTimer();
+
+        }
+
+        moves++;
+
+        isAnimating = false;
+
+        updateStats();
+
+        renderBoard();
+
+        // 检查胜利
+
+        if (checkWin()) {
+
+            finished = true;
+
+            clearInterval(timer);
+
+            messageElement.textContent =
+                "恭喜你！挑战成功！";
+
+        }
+
+    }, 180);
 
 }
 
-// ================================
-// 8. 键盘操作
-// ================================
+
+// =====================================
+// 8. 键盘方向键操作
+// =====================================
 
 document.addEventListener("keydown", function(event) {
+
+    if (finished || isAnimating) return;
 
     const empty = board.indexOf(0);
 
@@ -489,26 +835,39 @@ document.addEventListener("keydown", function(event) {
     switch (event.key) {
 
         case "ArrowUp":
+
             target = empty - size;
+
             break;
 
         case "ArrowDown":
+
             target = empty + size;
+
             break;
 
         case "ArrowLeft":
+
             if (empty % size !== 0) {
+
                 target = empty - 1;
+
             }
+
             break;
 
         case "ArrowRight":
+
             if (empty % size !== size - 1) {
+
                 target = empty + 1;
+
             }
+
             break;
 
         default:
+
             return;
 
     }
@@ -516,14 +875,17 @@ document.addEventListener("keydown", function(event) {
     event.preventDefault();
 
     if (target >= 0 && target < board.length) {
-        moveTile(target);
+
+        slideTile(target);
+
     }
 
 });
 
-// ================================
+
+// =====================================
 // 9. 计时器
-// ================================
+// =====================================
 
 function startTimer() {
 
@@ -537,15 +899,17 @@ function startTimer() {
 
 }
 
-// ================================
-// 10. 更新游戏数据
-// ================================
+
+// =====================================
+// 10. 更新数据
+// =====================================
 
 function updateStats() {
 
     movesElement.textContent = moves;
 
     const minutes = Math.floor(seconds / 60);
+
     const remainingSeconds = seconds % 60;
 
     timerElement.textContent =
@@ -558,21 +922,36 @@ function updateStats() {
 
 }
 
-// ================================
+
+// =====================================
 // 11. 开始新游戏
-// ================================
+// =====================================
 
 function newGame() {
 
+    // 清除旧计时器和动画
+
     clearInterval(timer);
 
+    clearTimeout(animationTimeout);
+
+    // 重置数据
+
     moves = 0;
+
     seconds = 0;
 
     started = false;
+
     finished = false;
 
+    isAnimating = false;
+
+    // 读取棋盘规格
+
     size = Number(sizeSelect.value);
+
+    // 生成新棋盘
 
     shuffleBoard();
 
@@ -585,17 +964,19 @@ function newGame() {
 
 }
 
-// ================================
+
+// =====================================
 // 12. 绑定按钮
-// ================================
+// =====================================
 
 restartButton.addEventListener("click", newGame);
 
 sizeSelect.addEventListener("change", newGame);
 
-// ================================
+
+// =====================================
 // 13. 初始化游戏
-// ================================
+// =====================================
 
 newGame();
 
