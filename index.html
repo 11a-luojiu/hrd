@@ -37,10 +37,14 @@ body{
   font-size:22px;
   user-select:none;
   touch-action:none;
+  cursor:pointer;
 }
 .block.caocao{
   background:#c44;
   color:#fff;
+}
+.block.active{
+  box-shadow:0 0 10px #fff;
 }
 .btn-wrap{
   text-align:center;
@@ -55,25 +59,31 @@ button{
   color:white;
   margin:4px;
 }
+.tip{
+  text-align:center;
+  font-size:14px;
+  color:#aaa;
+  margin:8px 0;
+}
 </style>
 </head>
 <body>
 <div id="info">步数：<span id="step">0</span></div>
+<div class="tip">电脑：选中方块，按方向键移动｜手机：滑动方块</div>
 <div id="board"></div>
 <div class="btn-wrap">
 <button onclick="reset()">重新开始</button>
 </div>
 
 <script>
-// 格子：4列 ×5行
 const COLS = 4;
 const ROWS = 5;
 let boardEl = document.getElementById('board');
 let stepEl = document.getElementById('step');
 let step = 0;
+let selectedBlock = null; // 当前选中的方块
 
 // 方块定义：{id,w,h,x,y,name}
-// x,y 是格子坐标；曹操是2×2
 let blocks = [
   {id:'cc', w:2, h:2, x:1, y:0, name:'曹', cls:'caocao'},
   {id:'a', w:1, h:2, x:0, y:0, name:'赵'},
@@ -86,8 +96,6 @@ let blocks = [
   {id:'h', w:1, h:1, x:1, y:4, name:'兵'},
   {id:'i', w:1, h:1, x:2, y:4, name:'兵'},
 ];
-let dragBlock = null;
-let startX, startY;
 
 function render(){
   boardEl.innerHTML = '';
@@ -96,12 +104,18 @@ function render(){
   blocks.forEach(b=>{
     let div = document.createElement('div');
     div.className = 'block ' + (b.cls||'');
+    if(selectedBlock && selectedBlock.id === b.id) div.classList.add('active');
     div.dataset.id = b.id;
     div.style.left = b.x * bw + 'px';
     div.style.top = b.y * bh + 'px';
     div.style.width = b.w * bw + 'px';
     div.style.height = b.h * bh + 'px';
     div.innerText = b.name;
+    // 点击选中方块
+    div.onclick = ()=>{
+      selectedBlock = b;
+      render();
+    }
     boardEl.appendChild(div);
   })
 }
@@ -138,20 +152,35 @@ function moveBlock(b, dx, dy){
 
 function checkWin(){
   let cc = blocks.find(x=>x.id==='cc');
-  // 曹操到最下方中间出口 (x=1,y=3)
+  // 曹操到出口
   if(cc.x === 1 && cc.y === 3){
     setTimeout(()=>alert('恭喜通关！一共走了'+step+'步'),100);
   }
 }
 
-// 触屏拖拽
+// 键盘方向键控制（电脑端）
+document.addEventListener('keydown', (e)=>{
+  if(!selectedBlock) return;
+  switch(e.key){
+    case 'ArrowUp': moveBlock(selectedBlock,0,-1); break;
+    case 'ArrowDown': moveBlock(selectedBlock,0,1); break;
+    case 'ArrowLeft': moveBlock(selectedBlock,-1,0); break;
+    case 'ArrowRight': moveBlock(selectedBlock,1,0); break;
+  }
+})
+
+// 触屏滑动（手机端）
+let dragBlock = null;
+let startX, startY;
 boardEl.addEventListener('touchstart', e=>{
   let touch = e.touches[0];
   let tar = e.target.closest('.block');
   if(!tar) return;
   dragBlock = blocks.find(b=>b.id === tar.dataset.id);
+  selectedBlock = dragBlock;
   startX = touch.clientX;
   startY = touch.clientY;
+  render();
 })
 boardEl.addEventListener('touchmove', e=>{
   e.preventDefault();
@@ -161,7 +190,6 @@ boardEl.addEventListener('touchend', e=>{
   let touch = e.changedTouches[0];
   let dx = touch.clientX - startX;
   let dy = touch.clientY - startY;
-  // 判断滑动方向
   if(Math.abs(dx) > Math.abs(dy)){
     if(dx > 30) moveBlock(dragBlock,1,0);
     else if(dx < -30) moveBlock(dragBlock,-1,0);
@@ -175,6 +203,7 @@ boardEl.addEventListener('touchend', e=>{
 function reset(){
   step = 0;
   stepEl.textContent = step;
+  selectedBlock = null;
   blocks = [
     {id:'cc', w:2, h:2, x:1, y:0, name:'曹', cls:'caocao'},
     {id:'a', w:1, h:2, x:0, y:0, name:'赵'},
